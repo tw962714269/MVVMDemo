@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Demo</string>
+    <string name="login_rsa_ecb">RSA/ECB/PKCS1Padding</string>
+    <!--加密公钥-->
+    <string name="rsa_public_key">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7RFs/FUK3RMgLbIpPNp2aII32
+9SUoX3r5UwgR9WkzDG+GwSrFL8TUXIbd2HisY34NiCoN4WVwbvxA3Az6ot4BDls1
+fQkiRFkGU3tv/ILhBBtr2l5bIHyTqK0eU76LNctA9bJz6ofUw3dHCwcSY+XFKMOR
+UD81LWnmj0MWSKzxtQIDAQAB</string>
+</resources>

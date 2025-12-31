@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Demo" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Demo" parent="Base.Theme.Demo" />
+    <style name="Theme.AppCompat.Empty" parent="" />
+    <style name="Theme.FullScreen" parent="XUITheme.Phone">
+        <!--将顶部状态栏设置为透明，并将界面内容布局上边界上提至状态栏顶部-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!--必须禁用fitsSystemWindows="false"，否则系统会自动添加 padding。-->
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+</resources>
