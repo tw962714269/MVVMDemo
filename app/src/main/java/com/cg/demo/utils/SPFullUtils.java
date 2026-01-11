@@ -402,4 +402,18 @@ public final class SPFullUtils {
         }
         return true;
     }
+
+    /**
+     * @param userToken
+     */
+    public void putUserToken(final String userToken) {
+        if (userToken == null) {
+            remove("userToken");
+        }
+        put("userToken", userToken, false);
+    }
+
+    public String getUserToken() {
+        return getString("userToken", "");
+    }
 }

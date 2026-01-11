@@ -29,6 +29,7 @@ import com.cg.demo.impl.IAcView;
 import com.cg.demo.impl.INetView;
 import com.cg.demo.network.Throwable.Exceptions;
 import com.cg.demo.ui.login.LoginAc;
+import com.cg.demo.ui.main.MainAc;
 import com.cg.demo.utils.ExitAppUtils;
 import com.cg.demo.utils.InputUtils;
 import com.cg.demo.utils.LanguageUtils;
@@ -66,7 +67,7 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         afterOnCreate(savedInstanceState);
 
         //// 仅首页注册退出回调，其他页面不注册（默认返回上一页）
-        if (this instanceof LoginAc) registerExitCallback();
+        if (this instanceof LoginAc || this instanceof MainAc) registerExitCallback();
 
         initViews();
         initEvents();

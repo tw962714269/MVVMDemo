@@ -42,7 +42,7 @@ public class Tip {
         });
     }
 
-    public static void finshOnLogin() {
+    public static void logout() {
         runOnUiThread(() -> {
             ActivityUtils.finishAllActivities();
             CleanUtils.cleanInternalSp();

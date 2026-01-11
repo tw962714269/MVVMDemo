@@ -8,14 +8,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.cg.demo.base.BaseViewModel;
 import com.cg.demo.bean.LoginBean;
-import com.cg.demo.network.Throwable.Exceptions;
 import com.cg.demo.utils.RSAUtil;
-import com.google.gson.Gson;
-
-import kotlin.jvm.functions.Function1;
+import com.cg.demo.utils.SPFullUtils;
 
 /**
  * @author:lee
@@ -39,7 +35,7 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
     // 核心校验：是否可以点击登录按钮（账号非空+密码非空+密码≥6位），自动根据输入变化更新
     public LiveData<Boolean> canLogin = Transformations.map(mUsernameInput, username -> {
         String pwd = mPasswordInput.getValue() == null ? "" : mPasswordInput.getValue();
-        return !username.trim().isEmpty() && !pwd.trim().isEmpty() && pwd.trim().length() >=6;
+        return !username.trim().isEmpty() && !pwd.trim().isEmpty() && pwd.trim().length() >= 6;
     });
 
     public String getUsernameInput() {
@@ -93,8 +89,9 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
             }, () -> {
                 //请求结束，当前在主线程回调
             }, data -> {    //订阅观察者，
-                if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())){
+                if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
                     mLoginMsg.postValue("登录成功");
+                    SPFullUtils.getInstance().putUserToken(data.getData().getToken());
                 }
                 onSuccess.onSuccess(data);
             }, throwable -> {

@@ -32,7 +32,7 @@ public class Exceptions extends Throwable {
         LogUtils.d(new Gson().toJson($this$errorMsg));
 
         if ("888".equals(JsonUtils.getString(new Gson().toJson($this$errorMsg), "errorCode"))) {
-            Tip.finshOnLogin();
+            Tip.logout();
             return "登录过期。请重新登录";
         }
         if ($this$errorMsg instanceof UnknownHostException) {

@@ -77,12 +77,12 @@ public abstract class BaseMvvmAc<V extends ViewDataBinding, VM extends BaseViewM
                     LogUtils.v("通用加载中逻辑：显示加载弹窗");
                     break;
                 case SUCCESS:
-                    // 通用成功逻辑：关闭加载弹窗，业务层处理具体数据
+                    // 通用成功逻辑：业务层处理具体数据
                     onRequestSuccess(state.getData());
                     LogUtils.v("通用成功逻辑：业务层处理具体数据");
                     break;
                 case ERROR:
-                    // 通用失败逻辑：关闭加载弹窗，显示默认错误提示，业务层可扩展
+                    // 通用失败逻辑：显示默认错误提示，业务层可扩展
                     showDefaultErrorTip(state.getError());
                     onRequestFailed(state.getError());
                     LogUtils.v("通用失败逻辑：显示默认错误提示，业务层可扩展");
@@ -95,7 +95,7 @@ public abstract class BaseMvvmAc<V extends ViewDataBinding, VM extends BaseViewM
                     LogUtils.v("通用取消逻辑：关闭加载弹窗，提示请求取消");
                     break;
                 case COMPLETED:
-                    // 通用结束逻辑：可做埋点、统计等
+                    // 通用结束逻辑：关闭加载弹窗，可做埋点、统计等
                     dismissLoadingDialog();
                     onRequestCompleted();
                     LogUtils.v("通用结束逻辑：关闭加载弹窗，可做埋点、统计等");

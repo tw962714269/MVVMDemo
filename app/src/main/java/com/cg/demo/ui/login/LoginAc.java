@@ -1,12 +1,15 @@
 package com.cg.demo.ui.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.cg.demo.BR;
 import com.cg.demo.R;
 import com.cg.demo.base.BaseMvvmAc;
 import com.cg.demo.databinding.AcLoginBinding;
 import com.cg.demo.event.EventHandlers;
+import com.cg.demo.ui.main.MainAc;
 import com.xuexiang.xui.utils.XToastUtils;
 
 public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
@@ -22,9 +25,6 @@ public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
     }
 
     public class ViewEvents extends EventHandlers {
-        public void exit() {
-        }
-
         public void login() {
             viewModel.login();
         }
@@ -61,5 +61,12 @@ public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
         if (hasFocus) {
             adjustLayout();
         }
+    }
+
+    @Override
+    public void onRequestSuccess(Object data) {
+        super.onRequestSuccess(data);
+        ActivityUtils.startActivity(new Intent(this, MainAc.class));
+        ActivityUtils.finishActivity(this);
     }
 }
