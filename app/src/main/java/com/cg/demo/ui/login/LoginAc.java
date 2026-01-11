@@ -2,7 +2,6 @@ package com.cg.demo.ui.login;
 
 import android.os.Bundle;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.cg.demo.BR;
 import com.cg.demo.R;
 import com.cg.demo.base.BaseMvvmAc;
@@ -24,6 +23,9 @@ public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
 
     public class ViewEvents extends EventHandlers {
         public void exit() {
+        }
+
+        public void login() {
             viewModel.login();
         }
     }
@@ -41,13 +43,23 @@ public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
             XToastUtils.toast(loginMsg);
         });
 
-        viewModel.loginSuccess.observe(this, success -> {
-            LogUtils.i("loginSuccess : " + success);
-        });
-
         viewModel.canLogin.observe(this, canLogin -> {
             binding.tvLogin.setEnabled(canLogin);
             binding.tvLogin.setTextColor(canLogin ? 0xff000000 : 0xff999999);
+            binding.tvLogin.setBackgroundColor(canLogin ? 0xFF08F40C : 0xFFF408F4);
         });
+    }
+
+    private void adjustLayout() {
+        adjustLayoutForStatusBar(binding.vTop);
+        adjustLayoutForNavigationBar(binding.vBottom);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            adjustLayout();
+        }
     }
 }

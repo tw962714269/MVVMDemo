@@ -31,14 +31,10 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
     // 私有化的可变LiveData - 只在ViewModel内部修改
     private final MutableLiveData<String> mUsernameInput = new MutableLiveData<>("");
     private final MutableLiveData<String> mPasswordInput = new MutableLiveData<>("");
-    private final MutableLiveData<String> mLoginMsg = new MutableLiveData<>("");
-    private final MutableLiveData<Boolean> mLoginSuccess = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>(false);
+    private final MutableLiveData<String> mLoginMsg = new MutableLiveData<>();
 
     // 对外暴露不可变LiveData - View层只能观察，不能修改
     public LiveData<String> loginMsg = mLoginMsg;
-    public LiveData<Boolean> loginSuccess = mLoginSuccess;
-    public LiveData<Boolean> isLoading = mIsLoading;
 
     // 核心校验：是否可以点击登录按钮（账号非空+密码非空+密码≥6位），自动根据输入变化更新
     public LiveData<Boolean> canLogin = Transformations.map(mUsernameInput, username -> {
@@ -82,7 +78,6 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
             return;
         }
 
-        mIsLoading.setValue(true);
         //构建登录实例
         LoginBean.LoginDTO loginDTO = LoginBean.LoginDTO.builder()
                 .loginName(username)
@@ -91,21 +86,20 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
                 .build();
 
         //登录请求
-        model.login(loginDTO, disposable -> {
-            LogUtils.i("http开始");
-            //请求开始，当前在主线程回调
-        }, () -> {
-            LogUtils.i("http结束");
-            //请求结束，当前在主线程回调
-        }, data -> {    //订阅观察者，
-            String json = new Gson().toJson(data);
-            LogUtils.i(data.toString() + "http成功：" + json);
-            mLoginMsg.postValue("登录成功");
-            mLoginSuccess.postValue(true);
-        }, throwable -> {
-            LogUtils.e("http失败：" + throwable.fillInStackTrace());
-            mLoginMsg.postValue(Exceptions.getErrorMsg(throwable));
-            mLoginSuccess.postValue(false);
+        executeRequest((onStart, onSuccess, onError) -> {
+            model.login(loginDTO, disposable -> {
+                //请求开始，当前在主线程回调
+                onStart.onStart(disposable);
+            }, () -> {
+                //请求结束，当前在主线程回调
+            }, data -> {    //订阅观察者，
+                if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())){
+                    mLoginMsg.postValue("登录成功");
+                }
+                onSuccess.onSuccess(data);
+            }, throwable -> {
+                onError.onError(throwable);
+            });
         });
     }
 }
