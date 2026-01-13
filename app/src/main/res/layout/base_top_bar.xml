@@ -7,7 +7,7 @@
 
         <variable
             name="toolbarViewModel"
-            type="com.cg.demo.base.BaseTopBarViewModel" />
+            type="com.cg.demo.base.BaseViewModel" />
     </data>
 
     <LinearLayout
@@ -33,7 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:onClick="@{()->toolbarViewModel.onBackPressed()}"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:src="@drawable/svg_back_333" />
@@ -47,7 +46,6 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:text="@{toolbarViewModel.titleText}"
                 android:textColor="@color/text_color"
                 android:textSize="20sp" />
 

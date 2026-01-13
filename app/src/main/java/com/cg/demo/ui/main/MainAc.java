@@ -8,6 +8,7 @@ import com.cg.demo.R;
 import com.cg.demo.base.BaseMvvmAc;
 import com.cg.demo.databinding.AcMainBinding;
 import com.cg.demo.event.EventHandlers;
+import com.cg.demo.network.Tip;
 
 public class MainAc extends BaseMvvmAc<AcMainBinding, MainViewModel> {
 
@@ -23,7 +24,7 @@ public class MainAc extends BaseMvvmAc<AcMainBinding, MainViewModel> {
 
     public class ViewEvents extends EventHandlers {
         public void exit() {
-            ActivityUtils.finishAllActivities();
+            Tip.logout();
         }
     }
 

@@ -2,6 +2,8 @@ package com.cg.demo.impl;
 
 import android.view.View;
 
+import com.xuexiang.xui.utils.XToastUtils;
+
 /**
  * FileName: INetView
  * Created by zlx on 2020/9/22 10:38
@@ -10,14 +12,15 @@ import android.view.View;
  */
 public interface INetView {
 
-    void showLoading();
+    void showLoadingDialog();
 
-    void showLoading(View view);
+    void dismissLoadingDialog();
 
-    void showSuccess();
+    void showDefaultErrorTip(Throwable throwable);
 
-    void showEmpty();
-
-    void onRetryBtnClick();
-
+    void showRequestCancelledTip();
+    void onRequestSuccess(Object data);
+    void onRequestFailed(Throwable throwable);
+    void onRequestCancelled();
+    void onRequestCompleted();
 }

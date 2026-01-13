@@ -42,14 +42,11 @@ public class Tip {
         });
     }
 
-    public static void finshOnLogin() {
+    public static void logout() {
         runOnUiThread(() -> {
-            mToast = Toast.makeText(ApplicationUtils.getApp(), "登录过期。请重新登录", Toast.LENGTH_LONG );
-            mToast.show();
             ActivityUtils.finishAllActivities();
             CleanUtils.cleanInternalSp();
-            ActivityUtils.startActivity("com.kp.tmsapp","com.cg.wmsapp.ui.login.LoginAc");
-            SPUtils.getInstance().clear();
+            ActivityUtils.startActivity("com.cg.demo","com.cg.demo.ui.login.LoginAc");
             SPFullUtils.getInstance().clear();
         });
     }

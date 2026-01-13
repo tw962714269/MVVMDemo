@@ -12,5 +12,4 @@ public interface IAcView {
     void initEvents();
     void beforeOnCreate(int requestedOrientation);
     void afterOnCreate(Bundle savedInstanceState);
-    void initImmersionBar(boolean fullScreen);
 }

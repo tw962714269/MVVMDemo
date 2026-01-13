@@ -1,6 +1,8 @@
 package com.cg.demo.base;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -23,9 +25,42 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 public class BaseViewModel<M extends BaseModel> extends AndroidViewModel implements IBaseViewModel, Consumer<Disposable> {
 
-    private UiChangeLiveData uiChangeLiveData;
-    private CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     protected M model;
+
+    // 全局请求状态分发（SingleLiveEvent避免粘性事件）
+    protected final SingleLiveEvent<BaseRequestState<?>> mRequestStateEvent = new SingleLiveEvent<>();
+    // 主线程Handler，确保所有回调在主线程执行
+    protected final Handler mMainHandler = new Handler(Looper.getMainLooper());
+
+    /**
+     * 获取请求状态事件（给View层订阅）
+     */
+    public SingleLiveEvent<BaseRequestState<?>> getRequestStateEvent() {
+        return mRequestStateEvent;
+    }
+
+    /**
+     * 分发请求状态（确保主线程）
+     */
+    protected void postRequestState(BaseRequestState<?> state) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            mRequestStateEvent.setValue(state);
+        } else {
+            mMainHandler.post(() -> mRequestStateEvent.setValue(state));
+        }
+    }
+
+    /**
+     * 取消所有请求
+     */
+    public void cancelAllRequests() {
+        if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
+            mCompositeDisposable.dispose();
+            postRequestState(BaseRequestState.cancelled());
+        }
+    }
+
 
     public BaseViewModel(@NonNull Application application) {
         super(application);
@@ -67,25 +102,16 @@ public class BaseViewModel<M extends BaseModel> extends AndroidViewModel impleme
     }
 
     protected void addDisposable(Disposable disposable) {
-        if (this.mCompositeDisposable == null) {
-            this.mCompositeDisposable = new CompositeDisposable();
-        }
-        this.mCompositeDisposable.add(disposable);
-    }
-
-    public UiChangeLiveData uiChangeLiveData() {
-        if (uiChangeLiveData == null) {
-            uiChangeLiveData = new UiChangeLiveData();
-        }
-        return uiChangeLiveData;
+        if (disposable != null && !disposable.isDisposed())
+            mCompositeDisposable.add(disposable);
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.clear();
-        }
+        cancelAllRequests();
+        mMainHandler.removeCallbacksAndMessages(null);
+
         if (model != null) {
             model.onCleared();
         }
@@ -93,7 +119,6 @@ public class BaseViewModel<M extends BaseModel> extends AndroidViewModel impleme
 
     @Override
     public void onAny(LifecycleOwner owner, Lifecycle.Event event) {
-
     }
 
     @Override
@@ -106,22 +131,18 @@ public class BaseViewModel<M extends BaseModel> extends AndroidViewModel impleme
 
     @Override
     public void onStart() {
-
     }
 
     @Override
     public void onStop() {
-
     }
 
     @Override
     public void onResume() {
-
     }
 
     @Override
     public void onPause() {
-
     }
 
 
@@ -130,22 +151,64 @@ public class BaseViewModel<M extends BaseModel> extends AndroidViewModel impleme
         addDisposable(disposable);
     }
 
-    public void onBackPressed() {
-        uiChangeLiveData.onBackPressedEvent.call();
+
+    // ========== 通用请求生命周期封装（业务层直接调用） ==========
+    /**
+     * 执行网络请求的通用封装
+     * @param requestAction 具体的请求逻辑（由业务层实现）
+     * @param <T> 请求成功数据类型
+     */
+    protected <T> void executeRequest(RequestAction<T> requestAction) {
+        // 1. 分发加载中状态
+        postRequestState(BaseRequestState.loading());
+
+        try {
+            // 2. 执行具体请求（业务层实现）
+            requestAction.execute(disposable -> {
+                // 请求开始：添加Disposable，分发加载中（已提前分发，可扩展额外逻辑）
+                addDisposable(disposable);
+            }, data -> {
+                // 3. 请求成功：分发成功状态
+                postRequestState(BaseRequestState.success(data));
+                // 4. 分发结束状态
+                postRequestState(BaseRequestState.completed());
+            }, throwable -> {
+                // 3. 请求失败：分发失败状态
+                postRequestState(BaseRequestState.error(throwable));
+                // 4. 分发结束状态
+                postRequestState(BaseRequestState.completed());
+            });
+        } catch (Exception e) {
+            postRequestState(BaseRequestState.error(e));
+            postRequestState(BaseRequestState.completed());
+        }
     }
 
-    public final class UiChangeLiveData extends SingleLiveEvent {
-        private SingleLiveEvent<Void> onBackPressedEvent;
+    /**
+     * 请求行为接口（业务层实现具体请求逻辑）
+     */
+    public interface RequestAction<T> {
+        /**
+         * 执行具体请求
+         * @param onStart 请求开始回调（传递Disposable）
+         * @param onSuccess 请求成功回调
+         * @param onError 请求失败回调
+         */
+        void execute(OnRequestStart onStart, OnRequestSuccess<T> onSuccess, OnRequestError onError);
+    }
 
-        public SingleLiveEvent<Void> onBackPressedEvent() {
-            return onBackPressedEvent = createLiveData(onBackPressedEvent);
-        }
+    // 请求开始回调
+    public interface OnRequestStart {
+        void onStart(Disposable disposable);
+    }
 
-        private <T> SingleLiveEvent<T> createLiveData(SingleLiveEvent<T> liveData) {
-            if (liveData == null) {
-                liveData = new SingleLiveEvent<>();
-            }
-            return liveData;
-        }
+    // 请求成功回调
+    public interface OnRequestSuccess<T> {
+        void onSuccess(T data);
+    }
+
+    // 请求失败回调
+    public interface OnRequestError {
+        void onError(Throwable throwable);
     }
 }

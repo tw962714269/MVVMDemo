@@ -13,15 +13,23 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#f00"
         android:orientation="vertical">
+
+        <View
+            android:id="@+id/v_top"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:hint="请输入账号"
+            android:inputType="number"
             android:text="@={viewModel.usernameInput}" />
 
         <EditText
@@ -29,15 +37,27 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:hint="请输入密码"
+            android:inputType="number"
             android:text="@={viewModel.passwordInput}" />
 
         <TextView
             android:id="@+id/tv_login"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{()->events.exit()}"
-            android:text="Hello World" />
+            android:gravity="center"
+            android:onClick="@{()->events.login()}"
+            android:padding="10dp"
+            android:text="Login" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <View
+            android:id="@+id/v_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
     </LinearLayout>
 
 </layout>

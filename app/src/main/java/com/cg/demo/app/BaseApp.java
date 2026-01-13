@@ -2,10 +2,6 @@ package com.cg.demo.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,13 +9,8 @@ import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.LogUtils;
-import com.cg.demo.bean.MessageEvent;
-import com.cg.demo.utils.NeverCrashUtils;
 import com.cg.demo.network.RxHttpManager;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import com.cg.demo.utils.NeverCrashUtils;
 
 /**
  * @author:lee
@@ -28,34 +19,16 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class BaseApp extends Application {
     private static BaseApp instance;
-    private String mBroadcastAction = "android.intent.ACTION_SCAN_OUTPUT";
-    private String mBroadcastLabel = "barcode";
 
     @Override
     public void onCreate() {
         super.onCreate();
         setApplication(this);
+        // 全局异常捕获
         crashException();
-        //当 App 中出现多进程, 并且您需要适配所有的进程, 就需要在 App 初始化时调用 initCompatMultiProcess()
-        //在 Demo 中跳转的三方库中的 DefaultErrorActivity 就是在另外一个进程中, 所以要想适配这个 Activity 就需要调用 initCompatMultiProcess()
-//        AutoSize.initCompatMultiProcess(this);
-        EventBus.getDefault().register(this);
-        //如果在某些特殊情况下出现 InitProvider 未能正常实例化, 导致 AndroidAutoSize 未能完成初始化
-        //可以主动调用 AutoSize.checkAndInit(this) 方法, 完成 AndroidAutoSize 的初始化后即可正常使用
-//        AutoSize.checkAndInit(this);
+
+        //初始化RxHttp网络请求架构
         RxHttpManager.init();
-
-        //注册广播
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(mBroadcastAction);
-//        registerReceiver(mBroadcastReceiver, intentFilter);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onMessageEvent(MessageEvent event) {
-        if (event.getSender() == BaseApp.instance) return;
-        LogUtils.v("收到消息：" + event.getMsg().toString());
-        EventBus.getDefault().removeStickyEvent(event);
     }
 
     /**
@@ -129,19 +102,4 @@ public class BaseApp extends Application {
         }
         return instance;
     }
-
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (mBroadcastAction.equals(action)) {
-                Bundle bundle = intent.getExtras();
-                if (bundle != null) {
-                    String barcode = bundle.getString(mBroadcastLabel);
-                    LogUtils.v("onReceive: barcode =" + barcode);
-                    EventBus.getDefault().postSticky(new MessageEvent(barcode, BaseApp.instance));
-                }
-            }
-        }
-    };
 }

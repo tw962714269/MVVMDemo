@@ -3,10 +3,7 @@ package com.cg.demo.base;
 import static com.xuexiang.xui.utils.XToastUtils.toast;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -14,7 +11,6 @@ import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,18 +27,17 @@ import com.cg.demo.R;
 import com.cg.demo.bean.MessageEvent;
 import com.cg.demo.impl.IAcView;
 import com.cg.demo.impl.INetView;
-import com.cg.demo.loadsir.EmptyCallback;
-import com.cg.demo.loadsir.LoadingCallback;
-import com.cg.demo.utils.DoubleClickExitDetector;
+import com.cg.demo.network.Throwable.Exceptions;
+import com.cg.demo.ui.login.LoginAc;
+import com.cg.demo.ui.main.MainAc;
+import com.cg.demo.utils.ExitAppUtils;
 import com.cg.demo.utils.InputUtils;
 import com.cg.demo.utils.LanguageUtils;
+import com.cg.demo.utils.NavigationStatusBarUtil;
 import com.google.gson.Gson;
-import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
-import com.kingja.loadsir.core.LoadService;
-import com.kingja.loadsir.core.LoadSir;
 import com.xuexiang.xui.utils.WidgetUtils;
 import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xui.widget.dialog.MiniLoadingDialog;
@@ -60,97 +55,41 @@ import java.util.List;
  */
 
 public abstract class BaseAc extends AppCompatActivity implements INetView, IAcView {
-
-
     protected TextView tvTitle;
-
     protected ImageView ivLeft;
     protected ImageView ivRight;
-
-    private LoadService loadService;
 
     protected MiniLoadingDialog mMiniLoadingDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        beforeOnCreate(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         afterOnCreate(savedInstanceState);
-        setTheme(getMTheme());
-        setSuspension();
-        if (getLayoutId() != 0) {
-            setContentView(getLayoutId());
-        }
-        initImmersionBar(fullScreen());
-        initEvents();
+
+        //// 仅首页注册退出回调，其他页面不注册（默认返回上一页）
+        if (this instanceof LoginAc || this instanceof MainAc) registerExitCallback();
+
         initViews();
-        doubleClickExitDetector =
-                new DoubleClickExitDetector(this, "再按一次退出", 2000);
+        initEvents();
     }
 
     @Override
     public void beforeOnCreate(int requestedOrientation) {
-        setRequestedOrientation(requestedOrientation);//竖屏
+        //设置横竖屏
+        //竖屏.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        //横屏.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        setRequestedOrientation(requestedOrientation);
     }
 
     @Override
     public void afterOnCreate(Bundle savedInstanceState) {
-
-    }
-
-    @Override
-    public void initEvents() {
-        mMiniLoadingDialog = WidgetUtils.getMiniLoadingDialog(this);
-
-        tvTitle = findViewById(R.id.tvTitle);
-        ivLeft = findViewById(R.id.ivLeft);
-        ivRight = findViewById(R.id.ivRight);
-        if (ivLeft != null) {
-            ivLeft.setOnClickListener(view -> finish());
-        }
+        setStatusBarDarkFont(true);
     }
 
     protected void setOnRightImgClickListener(View.OnClickListener listener) {
         if (ivRight != null) {
             ivRight.setOnClickListener(listener);
         }
-    }
-
-    @Override
-    public void showLoading() {
-        if (loadService == null) {
-            loadService = LoadSir.getDefault().register(this, v -> onRetryBtnClick());
-        }
-        loadService.showCallback(LoadingCallback.class);
-    }
-
-    @Override
-    public void showLoading(View view) {
-        if (loadService == null) {
-            loadService = LoadSir.getDefault().register(view, v -> onRetryBtnClick());
-        }
-        loadService.showCallback(LoadingCallback.class);
-    }
-
-    @Override
-    public void showEmpty() {
-        if (loadService == null) {
-            loadService = LoadSir.getDefault().register(this, v -> onRetryBtnClick());
-        }
-        loadService.showCallback(EmptyCallback.class);
-    }
-
-    @Override
-    public void showSuccess() {
-        if (loadService == null) {
-            loadService = LoadSir.getDefault().register(this, v -> onRetryBtnClick());
-        }
-        loadService.showSuccess();
-    }
-
-    @Override
-    public void onRetryBtnClick() {
-
     }
 
     @Override
@@ -204,51 +143,17 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         }
     }
 
-    @Override
-    public void initImmersionBar(boolean fullScreen) {
-        if (fullScreen) {
-            ImmersionBar.with(this)
-                    .fullScreen(true)
-                    .keyboardEnable(true)
-                    .hideBar(BarHide.FLAG_HIDE_BAR)
-                    .init();
-            return;
-        }
+    /**
+     * 设置状态栏字体颜色
+     *
+     * @param isBlack true.黑色 false.白色
+     */
+    public void setStatusBarDarkFont(boolean isBlack) {
         ImmersionBar.with(this)
-                .statusBarView(R.id.statusBarView)
-                .statusBarDarkFont(true)
-                .transparentBar()
-                .keyboardEnable(true)
-                .hideBar(BarHide.FLAG_SHOW_BAR)
-                .init();
-    }
-
-    public void resetImmersionBar(boolean fullScreen, boolean isBlack) {
-        if (fullScreen) {
-            ImmersionBar.with(this)
-                    .reset()
-                    .fullScreen(true)
-                    .keyboardEnable(true)
-                    .hideBar(BarHide.FLAG_HIDE_BAR)
-                    .init();
-            return;
-        }
-        ImmersionBar.with(this)
-                .reset()
-                .statusBarView(R.id.statusBarView)
                 .statusBarDarkFont(isBlack)
                 .transparentBar()
-                .keyboardEnable(true)
+                .keyboardEnable(false)
                 .init();
-    }
-
-    /**
-     * 是否全屏
-     *
-     * @return true全屏
-     */
-    protected boolean fullScreen() {
-        return false;
     }
 
     protected void setAcTitle(String title) {
@@ -323,25 +228,20 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         }
     }
 
-    /**
-     * 悬浮窗设置
-     */
-    private void setSuspension() {
-        WindowManager.LayoutParams mParams = getWindow().getAttributes();
-        mParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+    @Override
+    public void initViews() {
+        mMiniLoadingDialog = WidgetUtils.getMiniLoadingDialog(this);
+
+        tvTitle = findViewById(R.id.tvTitle);
+        ivLeft = findViewById(R.id.ivLeft);
+        ivRight = findViewById(R.id.ivRight);
     }
 
     @Override
-    public void initViews() {
-
-    }
-
-    protected int getLayoutId() {
-        return 0;
-    }
-
-    protected int getMTheme() {
-        return R.style.Theme_FullScreen;
+    public void initEvents() {
+        if (ivLeft != null) {
+            ivLeft.setOnClickListener(view -> finish());
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -389,23 +289,16 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         LogUtils.v("Base--->getPermissionFail");
     }
 
-
-    private DoubleClickExitDetector doubleClickExitDetector;
-
-    public boolean isDoubleClickExit() {
-        return ActivityUtils.getActivityList().size() == 1;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isDoubleClickExit()) {
-            boolean isExit = doubleClickExitDetector.click();
-            if (isExit) {
-                super.onBackPressed();
-            }
-        } else {
-            super.onBackPressed();
-        }
+    /**
+     * 注册首页的退出回调
+     */
+    private void registerExitCallback() {
+        // 退出逻辑：关闭所有Activity
+        ExitAppUtils.registerExitCallback(
+                getOnBackPressedDispatcher(),
+                this,
+                ActivityUtils::finishAllActivities
+        );
     }
 
     @Override
@@ -439,33 +332,99 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
     public void requestLoadingDialogShow() {
         if (mMiniLoadingDialog.isLoading() || mMiniLoadingDialog.isShowing()) return;
         mMiniLoadingDialog.show();
-//        RxJavaUtils.delay(30, aLong -> mMiniLoadingDialog.dismiss());
     }
 
     public void loadingDialogDismiss() {
         mMiniLoadingDialog.dismiss();
     }
 
-
     /**
      * 调整布局margin，适配状态栏高度
      */
     public void adjustLayoutForStatusBar(View view) {
         // 获取状态栏高度
-        int statusBarHeight = ImmersionBar.getStatusBarHeight(this);
+        int statusBarHeight = NavigationStatusBarUtil.getActualStatusBarHeight(this);
+        LogUtils.v("状态栏高度：" + statusBarHeight);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        params.setMargins(params.leftMargin, params.topMargin + statusBarHeight, params.rightMargin, params.bottomMargin);
+        params.setMargins(params.leftMargin, statusBarHeight, params.rightMargin, params.bottomMargin);
         view.setLayoutParams(params);
     }
 
-    /**
-     * 调整布局margin，适配导航栏高度
-     */
-    public void adjustLayoutFoNavigationBar(View view) {
+    public void adjustLayoutForNavigationBar(View view) {
         // 获取导航栏高度
-        int navigationBarHeight = ImmersionBar.getNavigationBarHeight(this);
+        int navigationBarHeight = NavigationStatusBarUtil.getActualNavigationBarHeight(this);
+        LogUtils.v("导航栏高度：" + navigationBarHeight);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, params.bottomMargin + navigationBarHeight);
+        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, navigationBarHeight);
         view.setLayoutParams(params);
+    }
+
+    // ========== 通用UI方法（Base层实现，业务层可重写） ==========
+
+    /**
+     * 显示加载弹窗（Base层默认实现，业务层可重写）
+     */
+    @Override
+    public void showLoadingDialog() {
+        // 示例：显示通用加载弹窗
+        requestLoadingDialogShow();
+    }
+
+    /**
+     * 关闭加载弹窗（Base层默认实现，业务层可重写）
+     */
+    @Override
+    public void dismissLoadingDialog() {
+        loadingDialogDismiss();
+    }
+
+    /**
+     * 显示默认错误提示（Base层默认实现，业务层可重写）
+     */
+    @Override
+    public void showDefaultErrorTip(Throwable throwable) {
+        String errorMsg = Exceptions.getErrorMsg(throwable);
+        XToastUtils.error("请求失败：" + (!TextUtils.isEmpty(errorMsg) ? errorMsg : "未知错误"));
+    }
+
+    /**
+     * 显示请求取消提示（Base层默认实现）
+     */
+    @Override
+    public void showRequestCancelledTip() {
+        XToastUtils.info("请求已取消");
+    }
+
+    // ========== 业务层需实现/重写的抽象方法（差异化处理） ==========
+
+    /**
+     * 请求成功（业务层实现具体逻辑）
+     */
+    @Override
+    public void onRequestSuccess(Object data) {
+
+    }
+
+    ;
+
+    /**
+     * 请求失败（业务层可扩展差异化处理）
+     */
+    @Override
+    public void onRequestFailed(Throwable throwable) {
+    }
+
+    /**
+     * 请求取消（业务层可扩展）
+     */
+    @Override
+    public void onRequestCancelled() {
+    }
+
+    /**
+     * 请求结束（业务层可扩展）
+     */
+    @Override
+    public void onRequestCompleted() {
     }
 }
