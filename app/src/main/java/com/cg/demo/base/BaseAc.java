@@ -13,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,10 +28,11 @@ import com.cg.demo.impl.INetView;
 import com.cg.demo.network.Throwable.Exceptions;
 import com.cg.demo.ui.login.LoginAc;
 import com.cg.demo.ui.main.MainAc;
+import com.cg.demo.ui.splash.SplashAc;
 import com.cg.demo.utils.ExitAppUtils;
 import com.cg.demo.utils.InputUtils;
 import com.cg.demo.utils.LanguageUtils;
-import com.cg.demo.utils.NavigationStatusBarUtil;
+import com.cg.demo.utils.NavigationStatusBarUtils;
 import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.permissions.OnPermissionCallback;
@@ -55,10 +54,6 @@ import java.util.List;
  */
 
 public abstract class BaseAc extends AppCompatActivity implements INetView, IAcView {
-    protected TextView tvTitle;
-    protected ImageView ivLeft;
-    protected ImageView ivRight;
-
     protected MiniLoadingDialog mMiniLoadingDialog;
 
     @Override
@@ -67,29 +62,20 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         afterOnCreate(savedInstanceState);
 
         //// 仅首页注册退出回调，其他页面不注册（默认返回上一页）
-        if (this instanceof LoginAc || this instanceof MainAc) registerExitCallback();
+        if (this instanceof SplashAc || this instanceof LoginAc || this instanceof MainAc)
+            registerExitCallback();
 
         initViews();
         initEvents();
     }
 
     @Override
-    public void beforeOnCreate(int requestedOrientation) {
-        //设置横竖屏
-        //竖屏.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        //横屏.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        setRequestedOrientation(requestedOrientation);
+    public void beforeOnCreate() {
     }
 
     @Override
     public void afterOnCreate(Bundle savedInstanceState) {
         setStatusBarDarkFont(true);
-    }
-
-    protected void setOnRightImgClickListener(View.OnClickListener listener) {
-        if (ivRight != null) {
-            ivRight.setOnClickListener(listener);
-        }
     }
 
     @Override
@@ -120,29 +106,6 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         return true;
     }
 
-    protected void setRightImg(int bg) {
-        if (ivRight != null) {
-            if (bg <= 0) {
-                ivRight.setVisibility(View.GONE);
-            } else {
-                ivRight.setVisibility(View.VISIBLE);
-                ivRight.setImageResource(bg);
-            }
-        }
-
-    }
-
-    protected void setLeftImg(int bg) {
-        if (ivLeft != null) {
-            if (bg <= 0) {
-                ivLeft.setVisibility(View.GONE);
-            } else {
-                ivLeft.setVisibility(View.VISIBLE);
-                ivLeft.setImageResource(bg);
-            }
-        }
-    }
-
     /**
      * 设置状态栏字体颜色
      *
@@ -156,32 +119,15 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
                 .init();
     }
 
-    protected void setAcTitle(String title) {
-        if (tvTitle != null) {
-            tvTitle.setText(title);
-        }
-    }
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (touchHideSoft()) {
-            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                View v = getCurrentFocus();
-                if (isShouldHideKeyboard(v, ev)) {
-                    hideKeyboard(v.getWindowToken());
-                }
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (isShouldHideKeyboard(v, ev)) {
+                hideKeyboard(v.getWindowToken());
             }
         }
         return super.dispatchTouchEvent(ev);
-    }
-
-    /**
-     * 是否触摸edittext以外的隐藏软键盘
-     *
-     * @return
-     */
-    protected boolean touchHideSoft() {
-        return true;
     }
 
     /**
@@ -231,17 +177,10 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
     @Override
     public void initViews() {
         mMiniLoadingDialog = WidgetUtils.getMiniLoadingDialog(this);
-
-        tvTitle = findViewById(R.id.tvTitle);
-        ivLeft = findViewById(R.id.ivLeft);
-        ivRight = findViewById(R.id.ivRight);
     }
 
     @Override
     public void initEvents() {
-        if (ivLeft != null) {
-            ivLeft.setOnClickListener(view -> finish());
-        }
     }
 
     @SuppressLint("CheckResult")
@@ -343,8 +282,7 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
      */
     public void adjustLayoutForStatusBar(View view) {
         // 获取状态栏高度
-        int statusBarHeight = NavigationStatusBarUtil.getActualStatusBarHeight(this);
-        LogUtils.v("状态栏高度：" + statusBarHeight);
+        int statusBarHeight = NavigationStatusBarUtils.getActualStatusBarHeight(this);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
         params.setMargins(params.leftMargin, statusBarHeight, params.rightMargin, params.bottomMargin);
         view.setLayoutParams(params);
@@ -352,8 +290,7 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
 
     public void adjustLayoutForNavigationBar(View view) {
         // 获取导航栏高度
-        int navigationBarHeight = NavigationStatusBarUtil.getActualNavigationBarHeight(this);
-        LogUtils.v("导航栏高度：" + navigationBarHeight);
+        int navigationBarHeight = NavigationStatusBarUtils.getActualNavigationBarHeight(this);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
         params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, navigationBarHeight);
         view.setLayoutParams(params);
@@ -404,8 +341,6 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
     public void onRequestSuccess(Object data) {
 
     }
-
-    ;
 
     /**
      * 请求失败（业务层可扩展差异化处理）

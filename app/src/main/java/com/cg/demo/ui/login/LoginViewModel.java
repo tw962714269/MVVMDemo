@@ -13,6 +13,8 @@ import com.cg.demo.bean.LoginBean;
 import com.cg.demo.utils.RSAUtil;
 import com.cg.demo.utils.SPFullUtils;
 
+import lombok.Getter;
+
 /**
  * @author:lee
  * @Date:2025/12/30 17:19
@@ -20,7 +22,9 @@ import com.cg.demo.utils.SPFullUtils;
  */
 public class LoginViewModel extends BaseViewModel<LoginModel> {
     // ========== 定义【普通Java变量】用于XML双向绑定，必须给get/set方法 ==========
+    @Getter
     private String usernameInput; // 账号输入内容-普通变量
+    @Getter
     private String passwordInput; // 密码输入内容-普通变量
 
 
@@ -38,17 +42,9 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
         return !username.trim().isEmpty() && !pwd.trim().isEmpty() && pwd.trim().length() >= 6;
     });
 
-    public String getUsernameInput() {
-        return usernameInput;
-    }
-
     public void setUsernameInput(String usernameInput) {
         this.usernameInput = usernameInput;
         mUsernameInput.setValue(usernameInput);
-    }
-
-    public String getPasswordInput() {
-        return passwordInput;
     }
 
     public void setPasswordInput(String passwordInput) {
@@ -88,12 +84,13 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
                 onStart.onStart(disposable);
             }, () -> {
                 //请求结束，当前在主线程回调
-            }, data -> {    //订阅观察者，
+            }, data -> {
+                //订阅观察者
                 if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
                     mLoginMsg.postValue("登录成功");
                     SPFullUtils.getInstance().putUserToken(data.getData().getToken());
                 }
-                onSuccess.onSuccess(data);
+                onSuccess.onSuccess(data.getData());
             }, throwable -> {
                 onError.onError(throwable);
             });

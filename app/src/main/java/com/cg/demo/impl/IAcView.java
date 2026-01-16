@@ -10,6 +10,6 @@ import android.os.Bundle;
 public interface IAcView {
     void initViews();
     void initEvents();
-    void beforeOnCreate(int requestedOrientation);
+    void beforeOnCreate();
     void afterOnCreate(Bundle savedInstanceState);
 }

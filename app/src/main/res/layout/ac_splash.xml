@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pv="http://schemas.android.com/apk/res-auto"
+    android:keepScreenOn="true">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.cg.demo.ui.splash.SplashViewModel" />
+    </data>
+
+    <me.wangyuwei.particleview.ParticleView
+        android:id="@+id/particleview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/common_backcolor"
+        pv:pv_background_color="@color/colorPrimary"
+        pv:pv_host_text="货运物流轨迹系统"
+        pv:pv_host_text_size="25sp"
+        pv:pv_particle_text="欢迎使用"
+        pv:pv_particle_text_size="15sp"
+        pv:pv_spread_anim_time="1500"
+        pv:pv_text_color="@color/white" />
+</layout>

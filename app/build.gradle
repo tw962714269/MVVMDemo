@@ -11,7 +11,7 @@ android {
         minSdk 29
         targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -90,6 +90,8 @@ dependencies {
     implementation "com.github.xuexiangjys:XUI:1.2.1"
     implementation "org.greenrobot:eventbus:3.2.0"
 
+    // 开屏动画
+    implementation "me.wangyuwei:ParticleView:1.0.4"
     // Lombok 核心库
     implementation 'org.projectlombok:lombok:1.18.30'
     // 注解处理器（必须添加，否则注解无法生效）
@@ -99,7 +101,7 @@ dependencies {
     implementation 'com.scwang.smart:refresh-layout-kernel:2.0.1'
     //二级刷新头
     implementation 'com.scwang.smart:refresh-header-two-level:2.0.1'
-
+    // BRAVH Adapter适配器
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4"
 
     implementation "com.github.getActivity:XXPermissions:18.63"

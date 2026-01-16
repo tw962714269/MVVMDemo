@@ -6,4 +6,14 @@
     <external-files-path name="external_files" path="." />
     <files-path name="internal_files" path="." />
     <!-- 其他需要共享的路径 -->
+    <!-- 适配 APK 下载/安装场景的路径配置 -->
+    <!-- 应用私有外部存储：/sdcard/Android/data/com.cg.demo/files/ -->
+    <external-files-path
+        name="apk_files"
+        path="apk/" /> <!-- 对应代码中下载的 APK 路径 -->
+
+    <!-- 应用私有缓存目录：/sdcard/Android/data/com.cg.demo/cache/ -->
+    <external-cache-path
+        name="cache_apk"
+        path="apk/" />
 </paths>

@@ -20,7 +20,7 @@ import android.view.WindowManager;
  * 2. 仅保留“屏幕可视区域判断”（核心）+“Window标记判断”（基础）+“品牌适配”（兜底）
  * 3. 全版本无异常，适配所有机型（包括定制ROM）
  */
-public class NavigationStatusBarUtil {
+public class NavigationStatusBarUtils {
 
     // ==================== 核心常量（品牌适配） ====================
     private static final String BRAND_XIAOMI = "xiaomi";
