@@ -12,16 +12,13 @@ public class FileUtils {
         FileOutputStream fos = new FileOutputStream(file, true);
         byte[] buffer = new byte[8192];
         int len;
-        long total = downloadedSize;
-        long fileSize = file.length() > 0 ? file.length() : 0;
+        long total = 0;
 
         while ((len = is.read(buffer)) != -1) {
             fos.write(buffer, 0, len);
             total += len;
-            // 计算进度
-            int progress = (int) (total * 100 / (fileSize + (total - downloadedSize)));
             if (listener != null) {
-                listener.onProgress(progress);
+                listener.onProgress(total);
             }
         }
         fos.flush();
@@ -29,11 +26,12 @@ public class FileUtils {
         is.close();
 
         if (listener != null) {
-            listener.onProgress(100);
+            listener.onFinished(total);
         }
     }
 
     public interface OnProgressUpdateListener {
-        void onProgress(int progress);
+        void onProgress(long progress);
+        void onFinished(long progress);
     }
 }

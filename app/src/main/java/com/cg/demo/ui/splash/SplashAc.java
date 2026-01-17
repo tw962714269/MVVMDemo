@@ -2,17 +2,19 @@ package com.cg.demo.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.cg.demo.BR;
 import com.cg.demo.R;
 import com.cg.demo.base.BaseMvvmAc;
+import com.cg.demo.bean.ReleaseAppVersionDTO;
+import com.cg.demo.constant.C;
 import com.cg.demo.databinding.AcSplashBinding;
 import com.cg.demo.manager.UpdateManager;
 import com.cg.demo.ui.login.LoginAc;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 public class SplashAc extends BaseMvvmAc<AcSplashBinding, SplashViewModel> {
 
@@ -42,7 +44,6 @@ public class SplashAc extends BaseMvvmAc<AcSplashBinding, SplashViewModel> {
 
     private void initListener() {
         binding.particleview.setOnParticleAnimListener(() -> {
-            LogUtils.v("动画加载完成");
             ActivityUtils.startActivity(new Intent(this, LoginAc.class));
             ActivityUtils.finishActivity(this);
         });
@@ -55,31 +56,32 @@ public class SplashAc extends BaseMvvmAc<AcSplashBinding, SplashViewModel> {
                 return;
             }
             if (requestCode < 0) {
-                // 进行版本更新
-                mUpdateManager = UpdateManager.getInstance(this);
-                mUpdateManager.setmUpdateInfo(viewModel.releaseVersionLiveData.getValue());
-                mUpdateManager.setOnDownloadProgressListener(new UpdateManager.OnDownloadProgressListener() {
-                    @Override
-                    public void onProgress(int progress) {
-                        LogUtils.i("下载进度：" + progress);
-                    }
+                ReleaseAppVersionDTO releaseAppVersionDTO = viewModel.releaseVersionLiveData.getValue();
 
-                    @Override
-                    public void onFailed(String errorMsg) {
-                        LogUtils.e("下载失败：" + errorMsg);
-                    }
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
+                        .title("发现新版本 v" + releaseAppVersionDTO.getVersionName())
+                        .content(releaseAppVersionDTO.getNotes())
+                        .positiveText("立即更新")
+                        .cancelable(releaseAppVersionDTO.getStatus() == 0)
+                        .onPositive((dialog, which) -> {
+                            showDownloadingDialog(releaseAppVersionDTO);
+                        })
+                        .cancelListener(dialogInterface -> {
+                            binding.particleview.startAnim();
+                        });
 
-                    @Override
-                    public void onComplete() {
-                        LogUtils.v("下载完成");
-                    }
-                });
-
-                new Handler(Looper.myLooper()).postDelayed(() -> {
-                    mUpdateManager.startDownload(this);
-                }, 2_000);
+                if (releaseAppVersionDTO.getStatus() == 0) {
+                    builder.negativeText("稍后更新")
+                            .onNegative((dialog, which) -> {
+                                binding.particleview.startAnim();
+                            });
+                }
+                builder.show();
                 return;
             }
+
+            // 删除APK目录
+            FileUtils.deleteAllInDir(C.APK_STORAGE_DIR);
             // 无需版本更新
             binding.particleview.startAnim();
         });
@@ -90,5 +92,25 @@ public class SplashAc extends BaseMvvmAc<AcSplashBinding, SplashViewModel> {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         mUpdateManager.onRequestPermissionsResult(requestCode, grantResults);
+    }
+
+    private void showDownloadingDialog(ReleaseAppVersionDTO releaseAppVersionDTO) {
+        // 进行版本更新
+        mUpdateManager = UpdateManager.getInstance(this);
+        mUpdateManager.setmUpdateInfo(releaseAppVersionDTO);
+        mUpdateManager.setOnDownloadProgressListener(new UpdateManager.OnDownloadProgressListener() {
+            @Override
+            public void onCancel() {
+                UpdateManager.OnDownloadProgressListener.super.onCancel();
+                LogUtils.i("下载取消");
+                if (releaseAppVersionDTO.getUpStatus() == 0) {
+                    binding.particleview.startAnim();
+                    return;
+                }
+                ActivityUtils.finishAllActivities();
+            }
+        });
+
+        mUpdateManager.startDownload(this);
     }
 }

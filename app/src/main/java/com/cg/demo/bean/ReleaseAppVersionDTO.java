@@ -29,4 +29,6 @@ public class ReleaseAppVersionDTO {
     private String downAddress;
     @JsonProperty("status")
     private Integer status;
+
+    private Long fileSize = 125552153L;
 }
