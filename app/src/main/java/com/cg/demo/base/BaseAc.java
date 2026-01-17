@@ -25,6 +25,9 @@ import com.cg.demo.R;
 import com.cg.demo.bean.MessageEvent;
 import com.cg.demo.impl.IAcView;
 import com.cg.demo.impl.INetView;
+import com.cg.demo.manager.NetworkMonitorManager;
+import com.cg.demo.manager.NetworkStateListener;
+import com.cg.demo.manager.NetworkType;
 import com.cg.demo.network.Throwable.Exceptions;
 import com.cg.demo.ui.login.LoginAc;
 import com.cg.demo.ui.main.MainAc;
@@ -53,7 +56,7 @@ import java.util.List;
  * Created by zlx on 2017/6/23.
  */
 
-public abstract class BaseAc extends AppCompatActivity implements INetView, IAcView {
+public abstract class BaseAc extends AppCompatActivity implements INetView, IAcView, NetworkStateListener {
     protected MiniLoadingDialog mMiniLoadingDialog;
 
     @Override
@@ -181,6 +184,8 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
 
     @Override
     public void initEvents() {
+        // 添加网络状态监听
+        NetworkMonitorManager.getInstance().addNetworkStateListener(this);
     }
 
     @SuppressLint("CheckResult")
@@ -255,6 +260,13 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
             EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 移除监听，防止内存泄漏
+        NetworkMonitorManager.getInstance().removeNetworkStateListener(this);
+    }
+
     /**
      * EventBus事件传递
      *
@@ -266,6 +278,11 @@ public abstract class BaseAc extends AppCompatActivity implements INetView, IAcV
         String text = event.getMsg().toString();
         LogUtils.v("收到消息：" + event.getMsg().toString());
         EventBus.getDefault().removeStickyEvent(event);
+    }
+
+    @Override
+    public void onNetworkStateChanged(boolean isAvailable, NetworkType networkType) {
+
     }
 
     public void requestLoadingDialogShow() {

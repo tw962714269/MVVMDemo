@@ -110,7 +110,7 @@ public abstract class BaseMvvmAc<V extends ViewDataBinding, VM extends BaseViewM
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing()){
+        if (isFinishing()) {
             viewModel.cancelAllRequests();
         }
     }

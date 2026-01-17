@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.cg.demo.manager.NetworkMonitorManager;
 import com.cg.demo.network.RxHttpManager;
 import com.cg.demo.utils.NeverCrashUtils;
 
@@ -29,6 +30,9 @@ public class BaseApp extends Application {
 
         //初始化RxHttp网络请求架构
         RxHttpManager.init();
+
+        // 初始化全局网络监听框架
+        NetworkMonitorManager.getInstance().init(this);
     }
 
     /**
@@ -101,5 +105,13 @@ public class BaseApp extends Application {
                     "please inherit BaseApplication or call setApplication.");
         }
         return instance;
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+
+        // 释放网络监听资源
+        NetworkMonitorManager.getInstance().release();
     }
 }

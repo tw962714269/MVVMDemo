@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -26,6 +25,7 @@ import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -37,6 +37,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+/**
+ * 版本更新
+ */
 public class UpdateManager {
     private static final int REQUEST_STORAGE_PERMISSION = 1001;
     private static final int REQUEST_INSTALL_PERMISSION = 1002;
@@ -71,7 +74,7 @@ public class UpdateManager {
         return sInstance;
     }
 
-    public void setmUpdateInfo(ReleaseAppVersionDTO mUpdateInfo) {
+    public void setUpdateInfo(ReleaseAppVersionDTO mUpdateInfo) {
         this.mUpdateInfo = mUpdateInfo;
     }
 
@@ -276,6 +279,13 @@ public class UpdateManager {
 
                     if (downloadDialog.isShowing()) {
                         downloadDialog.dismiss();
+                    }
+
+                    if (e instanceof UnknownHostException) {
+                        return;
+                    }
+                    if (e.getMessage() != null && e.getMessage().contains("Software caused connection abort")) {
+                        return;
                     }
 
                     downloadDialog = builder.content("下载遇到问题,请重新下载...")
