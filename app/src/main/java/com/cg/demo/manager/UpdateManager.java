@@ -1,18 +1,14 @@
 package com.cg.demo.manager;
 
-import android.Manifest;
-import android.app.Activity;
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.blankj.utilcode.util.ActivityUtils;
@@ -79,20 +75,10 @@ public class UpdateManager {
     }
 
     // 开始下载APK
-    public void startDownload(Activity activity) {
+    public boolean startDownload() {
         if (mUpdateInfo == null) {
             XToastUtils.info("暂无更新信息");
-            return;
-        }
-
-        // 检查存储权限（Android 6.0+）
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
-                ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_STORAGE_PERMISSION);
-            return;
+            return false;
         }
 
         // 检查安装权限（Android 8.0+）
@@ -100,12 +86,13 @@ public class UpdateManager {
             //请求授权安装应用权限
             Uri packageURI = Uri.parse("package:" + ActivityUtils.getTopActivity().getPackageName());
             Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI);
-            ActivityUtils.getTopActivity().startActivityForResult(intent, 1);
-            return;
+            ActivityUtils.getTopActivity().startActivityForResult(intent, REQUEST_INSTALL_PERMISSION);
+            return false;
         }
 
         // 创建下载任务
         downloadApk();
+        return true;
     }
 
     // 创建下载任务
@@ -300,16 +287,10 @@ public class UpdateManager {
     }
 
     // 权限请求回调处理
-    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
-        if (requestCode == REQUEST_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startDownload((Activity) mContext);
-            } else {
-                XToastUtils.warning("存储权限被拒绝，无法下载更新");
-            }
-        } else if (requestCode == REQUEST_INSTALL_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startDownload((Activity) mContext);
+    public void onRequestPermissionsResult(int requestCode, int resuleCode) {
+        if (requestCode == REQUEST_INSTALL_PERMISSION) {
+            if (resuleCode == RESULT_OK) {
+                startDownload();
             } else {
                 XToastUtils.warning("安装权限被拒绝，无法完成更新");
             }

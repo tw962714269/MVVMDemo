@@ -1,5 +1,7 @@
 package com.cg.demo.utils;
 
+import com.blankj.utilcode.util.AppUtils;
+
 /**
  * @author:lee
  * @Date:2025/8/11 16:40
@@ -8,18 +10,19 @@ package com.cg.demo.utils;
 public class VersionCompareUtils {
     /**
      * 比较版本号的大小,前者大则返回一个正数,后者大返回一个负数,相等则返回0
-     * @param version1 版本号1
-     * @param version2 版本号2
+     *
+     * @param apkVersion 安装包版本号
      * @return 比较结果
      */
-    public static int compareVersion(String version1, String version2) {
-        if (version1.equals(version2)) {
-            return 0;
+    public static boolean compareVersion(String apkVersion) {
+        String appVersionName = AppUtils.getAppVersionName();
+        if (appVersionName.equals(apkVersion)) {
+            return false;
         }
 
         // 分割版本号
-        String[] version1Array = version1.split("\\.");
-        String[] version2Array = version2.split("\\.");
+        String[] version1Array = appVersionName.split("\\.");
+        String[] version2Array = apkVersion.split("\\.");
 
         int minLength = Math.min(version1Array.length, version2Array.length);
         int index = 0;
@@ -27,20 +30,14 @@ public class VersionCompareUtils {
         // 循环比较每个部分
         while (index < minLength) {
             if (Integer.parseInt(version1Array[index]) > Integer.parseInt(version2Array[index])) {
-                return 1;
+                return false;
             } else if (Integer.parseInt(version1Array[index]) < Integer.parseInt(version2Array[index])) {
-                return -1;
+                return true;
             }
             index++;
         }
 
         // 如果前面部分都相同，则版本号长的更大
-        if (version1Array.length > version2Array.length) {
-            return 1;
-        } else if (version1Array.length < version2Array.length) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return version1Array.length >= version2Array.length;
     }
 }

@@ -60,7 +60,7 @@ public class RSAUtil {
             // 加密数据
             return encryptWithPublicKey(plainText, publicKey);
         } catch (Exception e) {
-             com.blankj.utilcode.util.LogUtils.e(e);
+            com.blankj.utilcode.util.LogUtils.e(e);
         }
         return "";
     }

@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * 写入APK文件
+ */
 public class FileUtils {
     // 写入文件并计算进度
     public static void writeFileFromIS(File file, InputStream is, long downloadedSize,
@@ -32,6 +35,7 @@ public class FileUtils {
 
     public interface OnProgressUpdateListener {
         void onProgress(long progress);
+
         void onFinished(long progress);
     }
 }

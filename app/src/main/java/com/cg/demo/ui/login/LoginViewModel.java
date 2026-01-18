@@ -39,7 +39,7 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
     // 核心校验：是否可以点击登录按钮（账号非空+密码非空+密码≥6位），自动根据输入变化更新
     public LiveData<Boolean> canLogin = Transformations.map(mUsernameInput, username -> {
         String pwd = mPasswordInput.getValue() == null ? "" : mPasswordInput.getValue();
-        return !username.trim().isEmpty() && !pwd.trim().isEmpty() && pwd.trim().length() >= 6;
+        return !username.trim().isEmpty() && username.trim().length() >= 6 && !pwd.trim().isEmpty() && pwd.trim().length() >= 6;
     });
 
     public void setUsernameInput(String usernameInput) {
