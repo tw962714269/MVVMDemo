@@ -13,6 +13,8 @@ import com.cg.demo.bean.LoginBean;
 import com.cg.demo.utils.RSAUtil;
 import com.cg.demo.utils.SPFullUtils;
 
+import lombok.Getter;
+
 /**
  * @author:lee
  * @Date:2025/12/30 17:19
@@ -20,7 +22,9 @@ import com.cg.demo.utils.SPFullUtils;
  */
 public class LoginViewModel extends BaseViewModel<LoginModel> {
     // ========== 定义【普通Java变量】用于XML双向绑定，必须给get/set方法 ==========
+    @Getter
     private String usernameInput; // 账号输入内容-普通变量
+    @Getter
     private String passwordInput; // 密码输入内容-普通变量
 
 
@@ -82,20 +86,21 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
                 .build();
 
         //登录请求
-        executeRequest((onStart, onSuccess, onError) ->
-                model.login(loginDTO, disposable -> {
-                    //请求开始，当前在主线程回调
-                    onStart.onStart(disposable);
-                }, () -> {
-                    //请求结束，当前在主线程回调
-                }, data -> {    //订阅观察者，
-                    if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
-                        mLoginMsg.postValue("登录成功");
-                        SPFullUtils.getInstance().putUserToken(data.getData().getToken());
-                    }
-                    onSuccess.onSuccess(data);
-                }, throwable -> {
-                    onError.onError(throwable);
-                }));
+        executeRequest((onStart, onSuccess, onError) -> {
+            model.login(loginDTO, disposable -> {
+                //请求开始，当前在主线程回调
+                onStart.onStart(disposable);
+            }, () -> {
+                //请求结束，当前在主线程回调
+            }, data -> {    //订阅观察者，
+                if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
+                    mLoginMsg.postValue("登录成功");
+                    SPFullUtils.getInstance().putUserToken(data.getData().getToken());
+                }
+                onSuccess.onSuccess(data);
+            }, throwable -> {
+                onError.onError(throwable);
+            });
+        });
     }
 }

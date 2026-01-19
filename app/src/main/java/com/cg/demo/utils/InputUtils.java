@@ -79,11 +79,12 @@ public class InputUtils {
         }
     }
 
-    public static void showSoftInput(View view){
+    public static void showSoftInput(View view) {
         new Handler().postDelayed(() -> {
             toggleSoftInput(view);
         }, 500);
     }
+
     /**
      * 强制显示输入法
      *

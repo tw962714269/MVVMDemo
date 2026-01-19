@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#4B98ED</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
     <color name="main">#ffffff</color>
     <!--首页底部tab-->
     <color name="text_color">#151515</color>
+
+    <!-- 无网络/请求失败弹窗专用颜色 -->
+    <color name="dialog_bg_transparent_80">#CC000000</color> <!-- 80%透明度黑色蒙层 -->
+    <color name="dialog_white">#FFFFFF</color> <!-- 弹窗白色背景 -->
+    <color name="dialog_title_color">#333333</color> <!-- 标题深色 -->
+    <color name="dialog_content_color">#666666</color> <!-- 内容灰色 -->
+    <color name="dialog_primary_color">#1E88E5</color> <!-- 主色（蓝色） -->
+    <color name="dialog_stroke_color">#E0E0E0</color> <!-- 按钮边框色 -->
 </resources>

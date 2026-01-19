@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dialog_bg_transparent_80"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <!-- 弹窗主体 -->
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_bg_radius_white"
+        android:orientation="vertical"
+        android:padding="25dp">
+
+        <!-- 失败图标 -->
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@android:drawable/ic_dialog_alert"
+            tools:ignore="ContentDescription" />
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:text="请求失败"
+            android:textColor="@color/dialog_title_color"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- 提示文案 -->
+        <TextView
+            android:id="@+id/tv_fail_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="网络异常，请检查网络后重试"
+            android:textColor="@color/dialog_content_color"
+            android:textSize="14sp"
+            tools:text="网络异常，请检查网络后重试" />
+
+        <!-- 按钮容器 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <!-- 取消按钮 -->
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_btn_cancel"
+                android:text="取消"
+                android:textColor="@color/dialog_primary_color"
+                android:textSize="15sp" />
+
+            <!-- 重试按钮 -->
+            <Button
+                android:id="@+id/btn_retry"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_btn_primary"
+                android:text="重新请求"
+                android:textColor="@color/dialog_white"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

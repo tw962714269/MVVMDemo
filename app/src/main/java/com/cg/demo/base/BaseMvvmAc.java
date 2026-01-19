@@ -108,8 +108,10 @@ public abstract class BaseMvvmAc<V extends ViewDataBinding, VM extends BaseViewM
      * 页面销毁时，取消所有请求
      */
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        viewModel.cancelAllRequests();
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            viewModel.cancelAllRequests();
+        }
     }
 }
