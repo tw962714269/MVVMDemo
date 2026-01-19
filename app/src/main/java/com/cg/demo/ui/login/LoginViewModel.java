@@ -82,21 +82,20 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
                 .build();
 
         //登录请求
-        executeRequest((onStart, onSuccess, onError) -> {
-            model.login(loginDTO, disposable -> {
-                //请求开始，当前在主线程回调
-                onStart.onStart(disposable);
-            }, () -> {
-                //请求结束，当前在主线程回调
-            }, data -> {    //订阅观察者，
-                if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
-                    mLoginMsg.postValue("登录成功");
-                    SPFullUtils.getInstance().putUserToken(data.getData().getToken());
-                }
-                onSuccess.onSuccess(data);
-            }, throwable -> {
-                onError.onError(throwable);
-            });
-        });
+        executeRequest((onStart, onSuccess, onError) ->
+                model.login(loginDTO, disposable -> {
+                    //请求开始，当前在主线程回调
+                    onStart.onStart(disposable);
+                }, () -> {
+                    //请求结束，当前在主线程回调
+                }, data -> {    //订阅观察者，
+                    if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
+                        mLoginMsg.postValue("登录成功");
+                        SPFullUtils.getInstance().putUserToken(data.getData().getToken());
+                    }
+                    onSuccess.onSuccess(data);
+                }, throwable -> {
+                    onError.onError(throwable);
+                }));
     }
 }
