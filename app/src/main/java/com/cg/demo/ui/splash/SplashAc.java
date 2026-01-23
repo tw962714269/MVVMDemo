@@ -2,6 +2,7 @@ package com.cg.demo.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
@@ -13,6 +14,8 @@ import com.cg.demo.databinding.AcSplashBinding;
 import com.cg.demo.manager.NetworkType;
 import com.cg.demo.manager.UpdateManager;
 import com.cg.demo.ui.login.LoginAc;
+import com.cg.demo.ui.main.MainAc;
+import com.cg.demo.utils.SPFullUtils;
 import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
@@ -55,7 +58,11 @@ public class SplashAc extends BaseMvvmAc<AcSplashBinding, SplashViewModel> {
 
     private void initListener() {
         binding.particleview.setOnParticleAnimListener(() -> {
-            ActivityUtils.startActivity(new Intent(this, LoginAc.class));
+            if (TextUtils.isEmpty(SPFullUtils.getInstance().getUserToken())) {
+                ActivityUtils.startActivity(LoginAc.class);
+            } else {
+                ActivityUtils.startActivity(MainAc.class);
+            }
             ActivityUtils.finishActivity(this);
         });
     }

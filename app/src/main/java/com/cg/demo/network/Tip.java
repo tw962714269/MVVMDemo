@@ -6,7 +6,7 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.CleanUtils;
-import com.blankj.utilcode.util.SPUtils;
+import com.cg.demo.ui.login.LoginAc;
 import com.cg.demo.utils.ApplicationUtils;
 import com.cg.demo.utils.SPFullUtils;
 
@@ -46,7 +46,7 @@ public class Tip {
         runOnUiThread(() -> {
             ActivityUtils.finishAllActivities();
             CleanUtils.cleanInternalSp();
-            ActivityUtils.startActivity("com.cg.demo","com.cg.demo.ui.login.LoginAc");
+            ActivityUtils.startActivity(LoginAc.class);
             SPFullUtils.getInstance().clear();
         });
     }

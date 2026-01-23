@@ -42,17 +42,9 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
         return !username.trim().isEmpty() && !pwd.trim().isEmpty() && pwd.trim().length() >= 6;
     });
 
-    public String getUsernameInput() {
-        return usernameInput;
-    }
-
     public void setUsernameInput(String usernameInput) {
         this.usernameInput = usernameInput;
         mUsernameInput.setValue(usernameInput);
-    }
-
-    public String getPasswordInput() {
-        return passwordInput;
     }
 
     public void setPasswordInput(String passwordInput) {
@@ -96,8 +88,8 @@ public class LoginViewModel extends BaseViewModel<LoginModel> {
                 if (data.getData() != null && !TextUtils.isEmpty(data.getData().getToken())) {
                     mLoginMsg.postValue("登录成功");
                     SPFullUtils.getInstance().putUserToken(data.getData().getToken());
+                    onSuccess.onSuccess(data.getData());
                 }
-                onSuccess.onSuccess(data);
             }, throwable -> {
                 onError.onError(throwable);
             });

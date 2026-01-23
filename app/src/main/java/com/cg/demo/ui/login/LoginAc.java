@@ -60,7 +60,7 @@ public class LoginAc extends BaseMvvmAc<AcLoginBinding, LoginViewModel> {
     public void onRequestSuccess(Object data) {
         super.onRequestSuccess(data);
         if (data instanceof LoginBean.LoginVO) {
-            ActivityUtils.startActivity(new Intent(this, MainAc.class));
+            ActivityUtils.startActivity(MainAc.class);
             ActivityUtils.finishActivity(this);
         }
     }

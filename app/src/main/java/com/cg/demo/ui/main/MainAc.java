@@ -2,7 +2,6 @@ package com.cg.demo.ui.main;
 
 import android.os.Bundle;
 
-import com.blankj.utilcode.util.ActivityUtils;
 import com.cg.demo.BR;
 import com.cg.demo.R;
 import com.cg.demo.base.BaseMvvmAc;
