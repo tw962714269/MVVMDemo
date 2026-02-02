@@ -40,6 +40,15 @@ android {
         viewBinding true
         dataBinding true
     }
+
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res',
+                    'src/main/res_svg'  // 指向res_svg根目录，而非内部drawable
+            ]
+        }
+    }
 }
 
 dependencies {
